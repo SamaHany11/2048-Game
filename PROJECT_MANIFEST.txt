@@ -1,0 +1,11 @@
+2048-java-swe-challenge
+
+Java: 17+
+Build: Maven
+Test framework: JUnit 5
+
+Includes:
+- Starter implementation with TODOs/stubs
+- Happy-path unit tests
+- OOP/clean-code challenge requirements
+- Reviewer notes and hidden-test suggestions
