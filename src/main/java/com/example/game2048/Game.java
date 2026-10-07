@@ -1,10 +1,13 @@
 package com.example.game2048;
 
+import com.example.game2048.exception.InvalidMoveException;
 import com.example.game2048.grid.Grid;
 import com.example.game2048.service.MoveService;
 import com.example.game2048.service.TileGenerator;
 
 public class Game {
+
+    private static final int STARTING_TILES = 2;
 
     private final Grid grid;
     private final MoveService moveService;
@@ -29,17 +32,34 @@ public class Game {
     }
 
     public void start() {
-        // TODO: Start a fresh game with two tiles.
+        grid.clear();
+        score = 0;
+        for (int i = 0; i < STARTING_TILES; i++) {
+            addRandomTile();
+        }
+        state = GameState.RUNNING;
     }
 
     public boolean move(Direction direction) {
-        // TODO: Reject moves when appropriate, move the board, update score,
-        // spawn a tile after a successful move and update game state.
-        return false;
+        if (state != GameState.RUNNING) {
+            throw new InvalidMoveException("Cannot move while the game is " + state);
+        }
+
+        boolean changed = moveService.move(direction);
+        if (!changed) {
+            return false;
+        }
+
+        score += moveService.getScoreOfLastMove();
+        addRandomTile();
+        if (isGameOver()) {
+            state = GameState.GAME_OVER;
+        }
+        return true;
     }
 
     public void restart() {
-        // TODO
+        start();
     }
 
     public GameState getState() {
@@ -54,8 +74,12 @@ public class Game {
         return grid;
     }
 
-    // TODO: The implementation should determine whether the game has ended.
+    private void addRandomTile() {
+        Position position = tileGenerator.pickPosition(grid.getEmptyPositions());
+        grid.setTile(position.row(), position.column(), tileGenerator.createTile());
+    }
+
     private boolean isGameOver() {
-        return false;
+        return grid.isFull() && !grid.hasEqualNeighbours();
     }
 }
